@@ -83,10 +83,17 @@ const RunDemo = function (filemap)
 	const pointLightDiffuse = new Vector(4, 4, 4);
 	const pointLightSpecular = new Vector(2, 2, 2);
 
-	// use light manager to create lights
+	// use light manager to create point lights
 	const lightManager = new LightManager(gl, shaders, ambientLight);
 	lightManager.addPointLight(pointLightPosition, pointLightDiffuse, pointLightSpecular);
 	lightManager.addPointLight(pointLightPosition, pointLightDiffuse, pointLightSpecular);
+
+	// PART 2 uncomment for directional light
+	// const dirLightDirection = new Vector(2, -2, 1);
+	// const dirLightDiffuse = new Vector(4, 0, 0);
+	// const dirLightSpecular = new Vector(0, 0, 4);
+	// lightManager.addDirectionalLight(dirLightDirection, dirLightDiffuse, dirLightSpecular);
+
 	lightManager.update();
 
 	// apply view and projection to shaders
