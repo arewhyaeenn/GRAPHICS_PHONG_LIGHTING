@@ -51,7 +51,7 @@ const RunDemo = function (filemap)
 
 	// set up view matrix
 	const viewMatrix = new Float32Array(16);
-	const cameraPosition = [0,3,7];
+	const cameraPosition = new Float32Array([0,3,7]);
 	const lookAtPosition = [0,0,0];
 	const cameraUpDirection = [0,1,0];
 	mat4.lookAt(
@@ -75,6 +75,20 @@ const RunDemo = function (filemap)
 		far          // distance to far clip plane
 	);
 
+	const projViewMatrix = Matrix.mul(projMatrix, viewMatrix);
+
+	// apply view and projection to shaders
+	for (shader of shaders)
+	{
+		gl.useProgram(shader);
+
+		const mProjViewUniformLocation = gl.getUniformLocation(shader, 'cam.mProjView');
+		gl.uniformMatrix4fv(mProjViewUniformLocation, gl.FALSE, projViewMatrix);
+
+		const camPositionUniformLocation = gl.getUniformLocation(shader, 'cam.position');
+		gl.uniform3fv(camPositionUniformLocation, cameraPosition);
+	}
+
 	// set ambient light parameters
 	const ambientLight = new Vector(0.4, 0.5, 0.4);
 
@@ -88,25 +102,12 @@ const RunDemo = function (filemap)
 	lightManager.addPointLight(pointLightPosition, pointLightDiffuse, pointLightSpecular);
 	lightManager.addPointLight(pointLightPosition, pointLightDiffuse, pointLightSpecular);
 
-	// PART 2 uncomment for directional light
-	// const dirLightDirection = new Vector(2, -2, 1);
-	// const dirLightDiffuse = new Vector(4, 0, 0);
-	// const dirLightSpecular = new Vector(0, 0, 4);
-	// lightManager.addDirectionalLight(dirLightDirection, dirLightDiffuse, dirLightSpecular);
+	const dirLightDirection = new Vector(2, -2, 1);
+	const dirLightDiffuse = new Vector(4, 0, 0);
+	const dirLightSpecular = new Vector(0, 0, 4)
+	lightManager.addDirectionalLight(dirLightDirection, dirLightDiffuse, dirLightSpecular);
 
 	lightManager.update();
-
-	// apply view and projection to shaders
-	for (shader of shaders)
-	{
-		gl.useProgram(shader);
-
-		const uvMatViewUniformLocation = gl.getUniformLocation(shader, 'mView');
-		gl.uniformMatrix4fv(uvMatViewUniformLocation, gl.FALSE, viewMatrix);
-
-		const uvMatProjUniformLocation = gl.getUniformLocation(shader, 'mProj');
-		gl.uniformMatrix4fv(uvMatProjUniformLocation, gl.FALSE, projMatrix);
-	}
 
 	// rgb emerald material properties
 	const emeraldDiffuse = new Vector(0.07568, 0.61424, 0.07568);
